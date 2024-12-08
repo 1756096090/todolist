@@ -2,6 +2,14 @@ stages:
   - build
   - test
   - deploy
+  - code_quality
+  - packing
+
+cache:
+  paths:
+    - build/libs
+
+
 
 build-job:
   stage: build
@@ -12,7 +20,9 @@ build-job:
     - echo "Compiling the code..."
     - ./gradlew clean build
     - echo "Compile complete."
-
+  artifacts:
+    paths:
+      - build/libs/ToDoList-0.0.1-SNAPSHOT.jar
 
 unit-test-job:
   stage: test
@@ -28,11 +38,30 @@ unit-test-job:
     reports:
       junit: build/test-results/test/TEST-*.xml
 
-
-integration-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+integration-test-job:   
+  stage: test   
   script:
     - echo "Running integration tests."
+
+packing-job:
+  stage: packing
+  image: gradle:jdk17
+  script:
+    - echo "Setting permissions for gradlew..."
+    - chmod +x ./gradlew
+
+
+stage:
+  packing
+before_script:
+  # Instalar SSH
+  - apk update && apk add --no-cache openssh-client
+script:
+  - echo "Ajustando los permisos de la clave"
+  - chmod 600 /builds/282510/to-do-list.tmp/AWS_KEY
+  - echo "Conectando a EC2 para copiar la nueva version de la aplicación"
+  - scp -o StrictHostKeyChecking=no i $AWS KEY build/libs/to-do-list-api-0.0.1-SNAPSHOT.jar ubuntu@3.145.138.105: /home/ubuntu/to-do-list-api/api.jar
+
 
 deploy-job:      # This job runs in the deploy stage.
   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
