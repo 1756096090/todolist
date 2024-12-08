@@ -3,6 +3,7 @@ stages:
   - test
   - deploy
 
+# Job para compilar la aplicación
 build-job:
   stage: build
   image: gradle:jdk17
@@ -13,20 +14,29 @@ build-job:
     - ./gradlew clean build
     - echo "Compile complete."
 
-
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+# Job para ejecutar unit tests
+unit-test-job:
+  stage: test
+  image: gradle:jdk17
   script:
     - echo "Running unit tests."
+    - ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/ # Ruta donde Gradle guarda los resultados de pruebas unitarias
+    reports:
+      junit: build/test-results/test/TEST-*.xml # Configura los reportes para que sean accesibles en GitLab CI
 
-
-integration-test-job:   # This job also runs in the test stage.
-  stage: test    # It can run at the same time as unit-test-job (in parallel).
+# Job para ejecutar pruebas de integración en paralelo
+integration-test-job:
+  stage: test
+  image: gradle:jdk17
   script:
     - echo "Running integration tests."
 
-deploy-job:      # This job runs in the deploy stage.
-  stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
+# Job para desplegar la aplicación en producción
+deploy-job:
+  stage: deploy
   environment: production
   script:
     - echo "Deploying application..."
