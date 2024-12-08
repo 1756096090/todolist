@@ -18,11 +18,13 @@ unit-test-job:
   stage: test
   image: gradle:jdk17
   script:
-    - echo "Running unit tests."
+    - echo "Setting permissions for gradlew..."
+    - chmod +x ./gradlew
+    - echo "Running unit tests..."
     - ./gradlew test
   artifacts:
     paths:
-      - build/test-results/test/ # Ruta donde Gradle guarda los resultados de pruebas unitarias
+      - build/test-results/test/
     reports:
       junit: build/test-results/test/TEST-*.xml
 
