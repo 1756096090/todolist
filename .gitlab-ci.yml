@@ -14,10 +14,17 @@ build-job:
     - echo "Compile complete."
 
 
-unit-test-job:   # This job runs in the test stage.
-  stage: test    # It only starts when the job in the build stage completes successfully.
+unit-test-job:
+  stage: test
+  image: gradle:jdk17
   script:
     - echo "Running unit tests."
+    - ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/ # Ruta donde Gradle guarda los resultados de pruebas unitarias
+    reports:
+      junit: build/test-results/test/TEST-*.xml
 
 
 integration-test-job:   # This job also runs in the test stage.
