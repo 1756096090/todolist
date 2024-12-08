@@ -5,7 +5,7 @@ stages:
 
 build-job:
   stage: build
-  image: gradle:alpine
+  image: gradle:jdk17
   script:
     - echo "Setting permissions for gradlew..."
     - chmod +x gradlew
