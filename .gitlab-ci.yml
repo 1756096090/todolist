@@ -58,9 +58,9 @@ before_script:
   - apk update && apk add --no-cache openssh-client
 script:
   - echo "Ajustando los permisos de la clave"
-  - chmod 600 /builds/282510/to-do-list.tmp/AWS_KEY
-  - echo "Conectando a EC2 para copiar la nueva version de la aplicación"
-  - scp -o StrictHostKeyChecking=no i $AWS KEY build/libs/to-do-list-api-0.0.1-SNAPSHOT.jar ubuntu@3.145.138.105: /home/ubuntu/to-do-list-api/api.jar
+  # - chmod 600 /builds/282510/to-do-list.tmp/AWS_KEY
+  # - echo "Conectando a EC2 para copiar la nueva version de la aplicación"
+  # - scp -o StrictHostKeyChecking=no i $AWS KEY build/libs/to-do-list-api-0.0.1-SNAPSHOT.jar ubuntu@3.145.138.105: /home/ubuntu/to-do-list-api/api.jar
 
 
 deploy-job:      # This job runs in the deploy stage.
