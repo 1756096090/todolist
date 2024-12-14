@@ -1,9 +1,10 @@
 stages:
   - build
   - test
+  - code_quality
   - packing
   - deploy
-  - code_quality
+
 
 
 cache:
@@ -12,51 +13,60 @@ cache:
 
 
 
-#build-job:
-#  stage: build
-#  image: gradle:jdk17
-#  script:
-#    - echo "Setting permissions for gradlew..."
-#    - chmod +x gradlew
-#    - echo "Compiling the code..."
-#    - ./gradlew clean build
-#    - echo "Compile complete."
-#  artifacts:
-#    paths:
-#      - build/libs/ToDoList-0.0.1-SNAPSHOT.jar
-#
-##unit-test-job:
-##  stage: test
-##  image: gradle:jdk17
-##  script:
-##    - echo "Setting permissions for gradlew..."
-##    - chmod +x ./gradlew
-##    - echo "Running unit tests..."
-##    - ./gradlew test
-##  artifacts:
-##    paths:
-##      - build/test-results/test/
-##    reports:
-##      junit: build/test-results/test/TEST-*.xml
-##
-##integration-test-job:
-##  stage: test
-##  script:
-##    - echo "Running integration tests."
-#
-#
-#
-#packing-job:
-#  stage: packing
-#  image: gradle:jdk17
-#  before_script:
-#    - apk update && apk add --no-cache openssh-client
-#  script:
-#    - echo "Adjusting key permissions..."
-#    - chmod 600 "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY"
-#    - echo "Connecting to EC2 to copy the new version of the application..."
-#    - scp -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" build/libs/ToDoList-0.0.1-SNAPSHOT.jar ec2-user@18.119.122.90:/home/ec2-user/ToDoList/api.jar
-#
+build-job:
+  stage: build
+  image: gradle:jdk17
+  script:
+    - echo "Setting permissions for gradlew..."
+    - chmod +x gradlew
+    - echo "Compiling the code..."
+    - ./gradlew clean build
+    - echo "Compile complete."
+  artifacts:
+    paths:
+      - build/libs/ToDoList-0.0.1-SNAPSHOT.jar
+
+unit-test-job:
+  stage: test
+  image: gradle:jdk17
+  script:
+    - echo "Setting permissions for gradlew..."
+    - chmod +x ./gradlew
+    - echo "Running unit tests..."
+    - ./gradlew test
+  artifacts:
+    paths:
+      - build/test-results/test/
+    reports:
+      junit: build/test-results/test/TEST-*.xml
+
+integration-test-job:
+  stage: test
+  script:
+    - echo "Running integration tests."
+
+code_quality-job:
+  image: gradle:jdk17
+  stage: code_quality
+  script:
+    - echo "Ejecutando análisis de calidad de código con Checkstyle"
+    - ./gradlew checkstyleMain checkstyleTest
+  artifacts:
+    paths:
+      - build/reports/checkstyle
+
+
+packing-job:
+  stage: packing
+  image: gradle:jdk17
+  before_script:
+    - apk update && apk add --no-cache openssh-client
+  script:
+    - echo "Adjusting key permissions..."
+    - chmod 600 "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY"
+    - echo "Connecting to EC2 to copy the new version of the application..."
+    - scp -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" build/libs/ToDoList-0.0.1-SNAPSHOT.jar ec2-user@18.119.122.90:/home/ec2-user/ToDoList/api.jar
+
 
 
 
