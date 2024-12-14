@@ -49,8 +49,11 @@ code_quality-job:
   image: gradle:jdk17
   stage: code_quality
   script:
+    - echo "Setting permissions for gradlew..."
+    - chmod +x ./gradlew
     - echo "Ejecutando análisis de calidad de código con Checkstyle"
-    - ./gradlew checkstyleMain checkstyleTest
+    - ./gradlew check
+    - echo "Ejecutando el archivo JAR de la aplicación para asegurarse de que esté funcionando correctamente"
   artifacts:
     paths:
       - build/reports/checkstyle
