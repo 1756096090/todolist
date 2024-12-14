@@ -1,9 +1,10 @@
 stages:
   - build
   - test
+  - packing
   - deploy
   - code_quality
-  - packing
+
 
 cache:
   paths:
