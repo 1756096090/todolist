@@ -52,7 +52,7 @@ packing-job:
     - apk update && apk add --no-cache openssh-client
   script:
     - echo "Adjusting key permissions..."
-    - chmod 600 "/builds/metodologia-de-desarrollo/Todolist.tmp/AWS_KEY"
+    - chmod 600 "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY"
     - echo "Connecting to EC2 to copy the new version of the application..."
     - scp -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" build/libs/ToDoList-0.0.1-SNAPSHOT.jar ec2-user@18.119.122.90:/home/ec2-user/ToDoList/api.jar
 
