@@ -59,9 +59,18 @@ packing-job:
 
 
 
-# deploy-job:      # This job runs in the deploy stage.
-#   stage: deploy  # It only runs when *both* jobs in the test stage complete successfully.
-#   environment: production
-#   script:
-#     - echo "Deploying application..."
-#     - echo "Application successfully deployed."
+deploy-job:
+  stage: deploy
+  environment: production
+  image: gradle:jdk17
+  script:
+    - echo "Starting deployment..."
+    - ssh -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" ec2-user@18.119.122.90 << 'EOF'
+      echo "Stopping existing application..."
+      sudo systemctl stop todolist
+      echo "Deploying new version..."
+      sudo cp /home/ec2-user/ToDoList/api.jar /opt/todolist/api.jar
+      echo "Starting the application..."
+      sudo systemctl start todolist
+      echo "Deployment complete!"
+      EOF
