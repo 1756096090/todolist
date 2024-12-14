@@ -67,10 +67,19 @@ deploy-job:
     - apk update && apk add --no-cache openssh-client
   script:
     - echo "Ajustando los permisos de la clave"
-    - chmod 600 /builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY
+    - chmod 600 "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY"
     - echo "Conectando a EC2 para desplegar la aplicación"
-    - echo "Detiene cualquier instancia previa de la API en ejecución"
-    - nohup ssh -o StrictHostKeyChecking=no i $AWS KEY ec2-user@18.119.122.90 "nohup pkill -f 'java -jar' > /dev/null 2>&1 &"
-    - echo "Ejecuta la nueva versión en segundo plano"
-    - nohup ssh -o StrictHostKeyChecking=no -i $AWS_KEY ec2-user@18.119.122.90 "nohup java -jar /home/ec2-user/ToDoList/api.jar > /dev/null 2>&1 &"
+
+    # Verificación de la transferencia del archivo JAR
+    - echo "Verificando si el archivo fue transferido correctamente"
+    - ssh -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" ec2-user@18.119.122.90 "ls /home/ec2-user/ToDoList/api.jar"
+
+    # Detener cualquier instancia previa de la API en ejecución
+    - echo "Deteniendo cualquier instancia previa de la API en ejecución"
+    - nohup ssh -vvv -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" ec2-user@18.119.122.90 "nohup pkill -f 'java -jar' > /dev/null 2>&1 &"
+
+    # Ejecutar la nueva versión en segundo plano
+    - echo "Ejecutando la nueva versión en segundo plano"
+    - nohup ssh -vvv -o StrictHostKeyChecking=no -i "/builds/metodologia-de-desarrollo/todolist.tmp/AWS_KEY" ec2-user@18.119.122.90 "nohup java -jar /home/ec2-user/ToDoList/api.jar > /dev/null 2>&1 &"
+
   environment: production
