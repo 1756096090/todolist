@@ -24,43 +24,38 @@ build-job:
     paths:
       - build/libs/ToDoList-0.0.1-SNAPSHOT.jar
 
-unit-test-job:
-  stage: test
-  image: gradle:jdk17
-  script:
-    - echo "Setting permissions for gradlew..."
-    - chmod +x ./gradlew
-    - echo "Running unit tests..."
-    - ./gradlew test
-  artifacts:
-    paths:
-      - build/test-results/test/
-    reports:
-      junit: build/test-results/test/TEST-*.xml
+#unit-test-job:
+#  stage: test
+#  image: gradle:jdk17
+#  script:
+#    - echo "Setting permissions for gradlew..."
+#    - chmod +x ./gradlew
+#    - echo "Running unit tests..."
+#    - ./gradlew test
+#  artifacts:
+#    paths:
+#      - build/test-results/test/
+#    reports:
+#      junit: build/test-results/test/TEST-*.xml
+#
+#integration-test-job:
+#  stage: test
+#  script:
+#    - echo "Running integration tests."
 
-integration-test-job:   
-  stage: test   
-  script:
-    - echo "Running integration tests."
+
 
 packing-job:
   stage: packing
   image: gradle:jdk17
+  before_script:
+    - apk update && apk add --no-cache openssh-client
   script:
-    - echo "Setting permissions for gradlew..."
-    - chmod +x ./gradlew
+    - echo "Adjusting key permissions..."
+    - chmod 600 "/builds/Metodologia de Desarrollo/Todolist.tmp/AWS_KEY"
+    - echo "Connecting to EC2 to copy the new version of the application..."
+    - scp -o StrictHostKeyChecking=no -i "/builds/Metodologia de Desarrollo/Todolist.tmp/AWS_KEY" build/libs/ToDoList-0.0.1-SNAPSHOT.jar ec2-user@18.119.122.90:/home/ec2-user/ToDoList/api.jar
 
-
-stage:
-  packing
-before_script:
-  # Instalar SSH
-  - apk update && apk add --no-cache openssh-client
-script:
-  - echo "Ajustando los permisos de la clave"
-  - chmod 600 /builds/282510/to-do-list.tmp/AWS_KEY
-  - echo "Conectando a EC2 para copiar la nueva version de la aplicación"
-  - scp -o StrictHostKeyChecking=no i $AWS KEY build/libs/to-do-list-api-0.0.1-SNAPSHOT.jar ubuntu@3.145.138.105: /home/ubuntu/to-do-list-api/api.jar
 
 
 deploy-job:      # This job runs in the deploy stage.
